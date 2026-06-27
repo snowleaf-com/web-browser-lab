@@ -1,0 +1,5 @@
+# Wasabi OS（run_on_wasabi.sh で clone する）
+/build/
+
+# Rust ビルド成果物
+**/target/
