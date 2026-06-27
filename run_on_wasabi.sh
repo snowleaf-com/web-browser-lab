@@ -5,6 +5,19 @@ TARGET_PATH=$PWD"/build"
 OS_PATH=$TARGET_PATH"/wasabi"
 APP_NAME="saba"
 MAKEFILE_PATH=$HOME_PATH"/Makefile"
+VNC_PASSWORD="${VNC_PASSWORD:-wasabi}"
+PORT_MONITOR="${PORT_MONITOR:-2345}"
+
+set_vnc_password_in_background() {
+  (
+    while ! nc -z localhost "${PORT_MONITOR}" 2>/dev/null; do
+      sleep 1
+    done
+    printf 'change vnc password %s\n' "${VNC_PASSWORD}" | nc localhost "${PORT_MONITOR}"
+  ) &
+  VNC_PASSWORD_PID=$!
+  trap 'kill "${VNC_PASSWORD_PID}" 2>/dev/null || true' EXIT
+}
 
 # execute `mkdir build/` if it doesn't exist
 if [ -d $TARGET_PATH ]
@@ -40,4 +53,7 @@ if [ ! -f $MAKEFILE_PATH ]; then
 fi
 
 make build
+
+set_vnc_password_in_background
+echo "QEMU starting. Connect VNC to vnc://localhost:5905 (password: ${VNC_PASSWORD})"
 $OS_PATH/scripts/run_with_app.sh ./target/x86_64-unknown-none/release/$APP_NAME
