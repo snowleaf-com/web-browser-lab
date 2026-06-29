@@ -20,4 +20,17 @@ impl Url {
             searchpart: "".to_string(),
         }
     }
+
+    pub fn parse(&mut self) -> Result<Self, String> {
+        if !self.is_http() {
+            return Err("Only Http scheme is supported.".to_string());
+        }
+    }
+
+    fn is_http(&mut self) -> bool {
+        if self.url.contains("http://") {
+            return true;
+        }
+        return false;
+    }
 }
